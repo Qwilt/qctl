@@ -5,7 +5,7 @@ The qctl is the main command-line interface for interacting with Qwilt Cloud ser
 ## Overview
 
 qctl provides a unified interface for managing Qwilt Cloud resources including
-authentication, configuration, clusters, applications, and images.
+authentication, clusters, applications, images, and more.
 
 ## Installation
 
@@ -45,26 +45,6 @@ Manage authentication and authorization.
 - **`qctl auth print-token`** - Print the access token from local cache
   - Displays the current access token in ExecCredential format for kubectl integration
 
-### Configuration Commands (`qctl config`)
-
-Manage Qwilt Cloud CLI configuration.
-
-- **`qctl config set-env [environment]`** - Set the default environment
-  - Examples:
-    ```bash
-    qctl config set-env staging
-    qctl config set-env production
-    ```
-
-- **`qctl config set-org-id [organization-id]`** - Set the default organization ID
-  - Examples:
-    ```bash
-    qctl config set-org-id my-org-id
-    ```
-
-- **`qctl config view`** - Display current configuration
-  - Shows environment, username, and organization ID with their sources
-
 ### Cluster Commands (`qctl clusters`)
 
 Manage clusters in the system.
@@ -86,7 +66,8 @@ Manage clusters in the system.
 
 ### Application Commands (`qctl applications`)
 
-Manage applications in the system. Can also be used with aliases: `apps`, `app`, `application`.
+Manage applications in the system. Can also be used with aliases: `apps`, `app`,
+`application`.
 
 - **`qctl applications list`** - List all applications
 - **`qctl applications get [app-name]`** - Get application details
@@ -100,23 +81,6 @@ Manage applications in the system. Can also be used with aliases: `apps`, `app`,
     - From file: `qctl applications delete -f app-definition.yaml`
   - Common flags: `--force`, `--grace-period`, `--timeout`, `--dry-run`, `--cascade`
 - **`qctl applications explain`** - Explain application resource format
-
-### Zone Commands (`qctl zones`)
-
-Manage zones in the system. Can also be used with alias: `zone`.
-
-- **`qctl zones list`** - List all zones
-- **`qctl zones get [zone-name]`** - Get zone details
-- **`qctl zones create`** - Create a new zone
-- **`qctl zones update`** - Update an existing zone
-- **`qctl zones delete [zone-name...]`** - Delete one or more zones
-  - Supports multiple deletion methods:
-    - By name: `qctl zones delete zone1 zone2`
-    - By selector: `qctl zones delete -l region=us-east`
-    - All resources: `qctl zones delete --all`
-    - From file: `qctl zones delete -f zone-definition.yaml`
-  - Common flags: `--force`, `--grace-period`, `--timeout`, `--dry-run`, `--cascade`
-- **`qctl zones explain`** - Explain zone resource format
 
 ### Image Commands (`qctl images`)
 
@@ -150,7 +114,8 @@ Manage images in the system.
 
 ## Zone Proxy Mode
 
-qctl supports a special zone proxy mode that allows you to run kubectl commands directly against zone-specific Kubernetes API servers.
+qctl supports a special zone proxy mode that allows you to run kubectl commands
+directly against zone-specific Kubernetes API servers.
 
 ### Zone Proxy Usage
 
@@ -192,7 +157,8 @@ This approach eliminates the need to maintain kubeconfig files under `~/.qc/kube
 
 ### Error Handling
 
-If the specified zone doesn't exist, qctl will show an error message along with a list of available zones:
+If the specified zone doesn't exist, qctl will show an error message along with
+a list of available zones:
 
 ```bash
 $ qctl --zone nonexistent-zone get pods
@@ -242,16 +208,37 @@ In verbose mode, you'll see:
 
 qctl stores configuration in the user's home directory. Configuration includes:
 
-- **Environment**: Default environment (staging/production)
 - **Username**: Authenticated user
 - **Organization ID**: Default organization
 - **Tokens**: Cached authentication tokens
 
 ## Authentication
 
-qctl uses token-based authentication. After logging in with `qctl auth login`, tokens are cached locally and used for subsequent API calls. The `qctl auth print-token` command can be used for kubectl integration.
+qctl uses token-based authentication. After logging in with `qctl auth login`,
+tokens are cached locally and used for subsequent API calls. The `qctl auth
+print-token` command can be used for kubectl integration.
 
-## Examples
+### Authentication Methods
+
+1. **Interactive Login**: Use `qctl auth login` to authenticate with username and password
+2. **Environment Variables**: Set `QC_USERNAME` and `QC_PASSWORD` for automatic authentication
+3. **API Token**: Set `QC_TOKEN` environment variable for direct API access (no login required)
+
+### Examples
+
+```bash
+# Method 1: Interactive login
+qctl auth login
+
+# Method 2: Environment variables for automatic login
+export QC_USERNAME=user@example.com
+export QC_PASSWORD=your_password
+qctl applications list
+
+# Method 3: API token (no login needed)
+export QC_TOKEN=your_api_token
+qctl applications list
+```
 
 ### Getting Started
 
@@ -260,17 +247,12 @@ qctl uses token-based authentication. After logging in with `qctl auth login`, t
    qctl auth login
    ```
 
-2. Set your default environment:
-   ```bash
-   qctl config set-env production
-   ```
-
-3. List available clusters:
+2. List available clusters:
    ```bash
    qctl clusters list
    ```
 
-4. Connect to a cluster:
+3. Connect to a cluster:
    ```bash
    qctl clusters connect my-cluster
    ```
@@ -287,23 +269,6 @@ qctl uses token-based authentication. After logging in with `qctl auth login`, t
    qctl images list
    ```
 
-### Managing Zones
-
-1. List all zones:
-   ```bash
-   qctl zones list
-   ```
-
-2. Get details of a specific zone:
-   ```bash
-   qctl zones get my-zone
-   ```
-
-3. Delete zones by selector:
-   ```bash
-   qctl zones delete -l region=us-east
-   ```
-
 ## Help
 
 For help with any command, use the `--help` flag:
@@ -312,12 +277,11 @@ For help with any command, use the `--help` flag:
 qctl --help
 qctl auth --help
 qctl clusters connect --help
-qctl zones --help
-qctl zones delete --help
+qctl applications --help
+qctl applications delete --help
 ```
 
 ## Troubleshooting
 
 - If authentication fails, ensure you're using the correct credentials and organization ID
-- For network issues, verify your environment configuration with `qctl config view`
 - Use verbose logging with `-v` flag for debugging
